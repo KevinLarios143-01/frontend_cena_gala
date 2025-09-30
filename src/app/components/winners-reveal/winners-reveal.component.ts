@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, ActivatedRoute } from '@angular/router';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -10,7 +11,15 @@ import { ApiService } from '../../services/api.service';
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule],
   templateUrl: './winners-reveal.component.html',
-  styleUrl: './winners-reveal.component.css'
+  styleUrl: './winners-reveal.component.css',
+  animations: [
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ transform: 'translateY(100px)', opacity: 0 }),
+        animate('500ms ease-in', style({ transform: 'translateY(0)', opacity: 1 }))
+      ])
+    ])
+  ]
 })
 export class WinnersRevealComponent implements OnInit {
   categories: any[] = [];
