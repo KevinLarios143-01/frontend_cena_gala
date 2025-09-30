@@ -1,0 +1,36 @@
+                <mat-card-actions>
+                  <button mat-button (click)="onSelectCategory(category)">
+                    <mat-icon>settings</mat-icon>
+                    Gestionar
+                  </button>
+                  <button mat-button color="warn" (click)="onDeleteCategory(category)">
+                    <mat-icon>delete</mat-icon>
+                    Eliminar
+                  </button>
+                  
+                  <!-- Botones de progreso normal -->
+                  <button mat-button *ngIf="category.status === 'NOMINATION'" 
+                          (click)="onGenerateFinalists(category.id)">
+                    Generar Finalistas
+                  </button>
+                  <button mat-button *ngIf="category.status === 'SELECTION_FINALISTS'" 
+                          (click)="onUpdateCategoryStatus(category.id, 'VOTING_FINAL')">
+                    Iniciar Votación
+                  </button>
+                  <button mat-button *ngIf="category.status === 'VOTING_FINAL'" 
+                          (click)="onUpdateCategoryStatus(category.id, 'FINISHED')">
+                    Finalizar
+                  </button>
+                  
+                  <!-- Botones de reapertura -->
+                  <button mat-button color="accent" *ngIf="category.status === 'SELECTION_FINALISTS' || category.status === 'VOTING_FINAL' || category.status === 'FINISHED'" 
+                          (click)="onReopenNominations(category.id)">
+                    <mat-icon>refresh</mat-icon>
+                    Reabrir Nominaciones
+                  </button>
+                  <button mat-button color="accent" *ngIf="category.status === 'FINISHED'" 
+                          (click)="onReopenVoting(category.id)">
+                    <mat-icon>refresh</mat-icon>
+                    Reabrir Votación
+                  </button>
+                </mat-card-actions>

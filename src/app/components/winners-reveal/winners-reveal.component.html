@@ -1,0 +1,102 @@
+<div class="reveal-container" [class.confetti-active]="showConfetti">
+  <!-- Confetti Animation -->
+  <div class="confetti" *ngIf="showConfetti">
+    <div class="confetti-piece" *ngFor="let i of [].constructor(50); let idx = index" 
+         [style.animation-delay]="(idx * 0.1) + 's'"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="reveal-header">
+    <button mat-button class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver al Dashboard
+    </button>
+    <h1 class="reveal-title" *ngIf="!singleCategoryMode">🏆 CEREMONIA DE PREMIACIÓN 🏆</h1>
+    <h1 class="reveal-title" *ngIf="singleCategoryMode">🏆 {{ categories[0]?.name?.toUpperCase() }} 🏆</h1>
+  </div>
+
+  <!-- Start Screen -->
+  <div class="start-screen" *ngIf="currentCategoryIndex === 0 && !isRevealing && !showWinner">
+    <div class="start-content">
+      <div class="oscar-statue">🏆</div>
+      <h2 *ngIf="!singleCategoryMode">¡Es hora de revelar a los ganadores!</h2>
+      <h2 *ngIf="singleCategoryMode">¡Es hora de revelar al ganador!</h2>
+      <p *ngIf="!singleCategoryMode">{{ categories.length }} categorías esperan ser anunciadas</p>
+      <p *ngIf="singleCategoryMode">{{ categories[0]?.name }}</p>
+      <button mat-raised-button class="start-btn" (click)="startReveal()">
+        <mat-icon>play_arrow</mat-icon>
+        <span *ngIf="!singleCategoryMode">Comenzar Ceremonia</span>
+        <span *ngIf="singleCategoryMode">Revelar Ganador</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Category Reveal -->
+  <div class="category-reveal" *ngIf="currentCategoryIndex < categories.length && (isRevealing || showWinner)">
+    <div class="category-info">
+      <h2 class="category-name">{{ getCurrentCategory()?.name }}</h2>
+      <p class="category-description">{{ getCurrentCategory()?.description }}</p>
+    </div>
+
+    <!-- Suspense Animation -->
+    <div class="suspense-container" *ngIf="isRevealing">
+      <div class="envelope">
+        <div class="envelope-flap"></div>
+        <div class="envelope-body"></div>
+      </div>
+      <div class="suspense-text">
+        <h3>Y el ganador es...</h3>
+        <div class="dots">
+          <span>.</span><span>.</span><span>.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Winner Reveal -->
+    <div class="winner-reveal" *ngIf="showWinner" [@slideIn]>
+      <div class="winner-card">
+        <div class="winner-crown">👑</div>
+        <div class="winner-info">
+          <h1 class="winner-name">{{ getCurrentCategory()?.winner?.participant?.name }}</h1>
+          <p class="winner-description">{{ getCurrentCategory()?.winner?.participant?.description }}</p>
+          <div class="winner-votes">
+            <mat-icon>how_to_vote</mat-icon>
+            {{ getCurrentCategory()?.winner?._count?.votes || 0 }} votos
+          </div>
+        </div>
+        <div class="winner-trophy">🏆</div>
+      </div>
+
+      <button mat-raised-button class="next-btn" (click)="nextCategory()" 
+              *ngIf="currentCategoryIndex < categories.length - 1 && !singleCategoryMode">
+        <mat-icon>navigate_next</mat-icon>
+        Siguiente Categoría
+      </button>
+
+      <button mat-raised-button class="finish-btn" (click)="goBack()" 
+              *ngIf="currentCategoryIndex === categories.length - 1 || singleCategoryMode">
+        <mat-icon>celebration</mat-icon>
+        <span *ngIf="!singleCategoryMode">Finalizar Ceremonia</span>
+        <span *ngIf="singleCategoryMode">Volver al Dashboard</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Final Celebration -->
+  <div class="final-celebration" *ngIf="currentCategoryIndex >= categories.length">
+    <div class="celebration-content">
+      <h1>🎉 ¡CEREMONIA COMPLETADA! 🎉</h1>
+      <p>Todos los ganadores han sido revelados</p>
+      <div class="winners-summary">
+        <div class="winner-item" *ngFor="let category of categories">
+          <span class="category">{{ category.name }}:</span>
+          <span class="winner">{{ category.winner?.participant?.name }}</span>
+        </div>
+      </div>
+      <button mat-raised-button class="finish-btn" (click)="goBack()">
+        <mat-icon>home</mat-icon>
+        Volver al Dashboard
+      </button>
+    </div>
+  </div>
+</div>

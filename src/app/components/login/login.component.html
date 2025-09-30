@@ -1,0 +1,137 @@
+<div class="login-container">
+  <div class="login-wrapper">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="logo-container">
+        <mat-icon class="logo-icon">how_to_vote</mat-icon>
+        <h1 class="app-title">Cena de Gala</h1>
+      </div>
+      <p class="app-subtitle">Sistema de Votaciones</p>
+    </div>
+
+    <!-- Login Card -->
+    <mat-card class="login-card">
+      <mat-card-content>
+        <mat-tab-group class="custom-tabs">
+          <mat-tab label="Iniciar Sesión">
+            <div class="tab-content">
+              <div class="welcome-text">
+                <h2>¡Bienvenido!</h2>
+                <p>Ingresa tus credenciales para acceder</p>
+              </div>
+              
+              <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+                <mat-form-field appearance="fill" class="custom-field">
+                  <mat-label>Correo Electrónico</mat-label>
+                  <input matInput type="email" formControlName="email" required>
+                  <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+                    El email es requerido
+                  </mat-error>
+                  <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+                    Email inválido
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="custom-field">
+                  <mat-label>Contraseña</mat-label>
+                  <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
+                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+                    La contraseña es requerida
+                  </mat-error>
+                  <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+                    Mínimo 6 caracteres
+                  </mat-error>
+                </mat-form-field>
+
+                <div *ngIf="error" class="error-message">
+                  <mat-icon>error</mat-icon>
+                  {{ error }}
+                </div>
+
+                <button mat-raised-button color="primary" type="submit" class="login-button"
+                        [disabled]="!loginForm.valid || loading">
+                  <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+                  <mat-icon *ngIf="!loading">login</mat-icon>
+                  {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+                </button>
+              </form>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Registrarse">
+            <div class="tab-content">
+              <div class="welcome-text">
+                <h2>Crear Cuenta</h2>
+                <p>Únete a nuestro sistema de votaciones</p>
+              </div>
+              
+              <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="login-form">
+                <mat-form-field appearance="fill" class="custom-field">
+                  <mat-label>Nombre Completo</mat-label>
+                  <input matInput type="text" formControlName="name" required>
+                  <mat-error *ngIf="registerForm.get('name')?.hasError('required')">
+                    El nombre es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="custom-field">
+                  <mat-label>Correo Electrónico</mat-label>
+                  <input matInput type="email" formControlName="email" required>
+                  <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
+                    El email es requerido
+                  </mat-error>
+                  <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
+                    Email inválido
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="custom-field">
+                  <mat-label>Contraseña</mat-label>
+                  <input matInput [type]="hideRegisterPassword ? 'password' : 'text'" formControlName="password" required>
+                  <button mat-icon-button matSuffix (click)="hideRegisterPassword = !hideRegisterPassword" type="button">
+                    <mat-icon>{{hideRegisterPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
+                    La contraseña es requerida
+                  </mat-error>
+                  <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+                    Mínimo 6 caracteres
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="custom-field">
+                  <mat-label>Código de Organización</mat-label>
+                  <input matInput formControlName="tenantSlug" required placeholder="empresa-demo">
+                  <mat-hint>Solicita este código al administrador de tu organización</mat-hint>
+                  <mat-error *ngIf="registerForm.get('tenantSlug')?.hasError('required')">
+                    El código de organización es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <div *ngIf="error" class="error-message">
+                  <mat-icon>error</mat-icon>
+                  {{ error }}
+                </div>
+
+                <button mat-raised-button color="accent" type="submit" class="login-button"
+                        [disabled]="!registerForm.valid || loading">
+                  <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+                  <mat-icon *ngIf="!loading">person_add</mat-icon>
+                  {{ loading ? 'Creando cuenta...' : 'Crear Cuenta' }}
+                </button>
+              </form>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Footer -->
+    <div class="footer-section">
+      <p>© 2024 Cena de Gala - Votaciones Seguras y Transparentes</p>
+    </div>
+  </div>
+</div>

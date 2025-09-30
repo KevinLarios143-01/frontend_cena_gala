@@ -1,0 +1,281 @@
+<mat-toolbar class="oscar-navbar">
+  <mat-icon class="navbar-icon">emoji_events</mat-icon>
+  <span class="navbar-title">Dashboard - Cena de Gala</span>
+  <span class="spacer"></span>
+  <span class="user-info">
+    <mat-icon>person</mat-icon>
+    {{ authService.getCurrentUser()?.name }}
+  </span>
+  <button mat-button class="logout-btn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Cerrar Sesión
+  </button>
+</mat-toolbar>
+
+<div class="dashboard-container">
+  <!-- Estadísticas -->
+  <div class="stats-section">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Estadísticas Generales</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <h3>{{ stats.totalUsers || 0 }}</h3>
+            <p>Usuarios</p>
+          </div>
+          <div class="stat-item">
+            <h3>{{ stats.totalCategories || 0 }}</h3>
+            <p>Categorías</p>
+          </div>
+          <div class="stat-item">
+            <h3>{{ stats.totalNominations || 0 }}</h3>
+            <p>Nominaciones</p>
+          </div>
+          <div class="stat-item">
+            <h3>{{ stats.totalVotes || 0 }}</h3>
+            <p>Votos</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-tab-group #tabGroup>
+    <!-- Gestión de Categorías -->
+    <mat-tab label="Categorías">
+      <div class="tab-content">
+        <mat-card class="action-card">
+          <mat-card-header>
+            <mat-icon class="card-icon">emoji_events</mat-icon>
+            <mat-card-title>Ceremonia de Premiación</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="system-actions">
+              <button mat-raised-button class="ceremony-btn" (click)="startCeremony()">
+                <mat-icon>celebration</mat-icon>
+                Iniciar Ceremonia de Ganadores
+              </button>
+              <p class="ceremony-info">Presenta a los ganadores con transiciones emocionantes</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card">
+          <mat-card-header>
+            <mat-icon class="card-icon">settings</mat-icon>
+            <mat-card-title>Gestión de Sistema</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="system-actions">
+              <button mat-raised-button color="warn" (click)="onResetSystem()">
+                <mat-icon>refresh</mat-icon>
+                Reiniciar Sistema
+              </button>
+              <p class="reset-warning">Esto eliminará todos los datos y creará categorías por defecto</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card">
+          <mat-card-header>
+            <mat-icon class="card-icon">add_circle</mat-icon>
+            <mat-card-title>Crear Nueva Categoría</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="categoryForm" (ngSubmit)="onCreateCategory()">
+              <mat-form-field appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="name" required>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Descripción</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+              </mat-form-field>
+              
+              <button mat-raised-button color="primary" type="submit" [disabled]="!categoryForm.valid">
+                Crear Categoría
+              </button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="main-card">
+          <mat-card-header>
+            <mat-icon class="card-icon">category</mat-icon>
+            <mat-card-title>Categorías Existentes</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="categories-grid">
+              <mat-card *ngFor="let category of categories" class="category-card">
+                <mat-card-header>
+                  <mat-card-title>{{ category.name }}</mat-card-title>
+                  <mat-card-subtitle>{{ category.description }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <mat-chip-set>
+                    <mat-chip [color]="getStatusColor(category.status)" selected>
+                      {{ getStatusText(category.status) }}
+                    </mat-chip>
+                  </mat-chip-set>
+                  <p>Nominaciones: {{ category._count?.nominations || 0 }}</p>
+                  <p>Votos: {{ category._count?.votes || 0 }}</p>
+                </mat-card-content>
+                <mat-card-actions>
+                  <button mat-button (click)="onSelectCategory(category)">
+                    <mat-icon>settings</mat-icon>
+                    Gestionar
+                  </button>
+                  <button mat-button color="warn" (click)="onDeleteCategory(category)">
+                    <mat-icon>delete</mat-icon>
+                    Eliminar
+                  </button>
+                  
+                  <!-- Botones de progreso normal -->
+                  <button mat-button *ngIf="category.status === 'NOMINATION'" 
+                          (click)="onGenerateFinalists(category.id)">
+                    Generar Finalistas
+                  </button>
+                  <button mat-button *ngIf="category.status === 'SELECTION_FINALISTS'" 
+                          (click)="onUpdateCategoryStatus(category.id, 'VOTING_FINAL')">
+                    Iniciar Votación
+                  </button>
+                  <button mat-button *ngIf="category.status === 'VOTING_FINAL'" 
+                          (click)="onUpdateCategoryStatus(category.id, 'FINISHED')">
+                    Finalizar
+                  </button>
+                  <br>
+                  <!-- Botones de reapertura -->
+                  <button mat-button color="accent" *ngIf="category.status === 'SELECTION_FINALISTS' || category.status === 'VOTING_FINAL' || category.status === 'FINISHED'" 
+                          (click)="onReopenNominations(category.id)">
+                    <mat-icon>refresh</mat-icon>
+                    Reabrir Nominaciones
+                  </button>
+                  <button mat-button color="accent" *ngIf="category.status === 'FINISHED'" 
+                          (click)="onReopenVoting(category.id)">
+                    <mat-icon>refresh</mat-icon>
+                    Reabrir Votación
+                  </button>
+                  <button mat-button class="ceremony-category-btn" *ngIf="category.status === 'FINISHED'" 
+                          (click)="startCategoryReveal(category.id)">
+                    <mat-icon>celebration</mat-icon>
+                    Ceremonia
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Resultados -->
+    <mat-tab label="Resultados">
+      <div class="tab-content">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Resultados de Votaciones</mat-card-title>
+            <mat-card-subtitle>Resultados finales de todas las categorías</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="results-section" *ngFor="let category of categories">
+              <h3>{{ category.name }}</h3>
+              <mat-chip [color]="getStatusColor(category.status)" selected>
+                {{ getStatusText(category.status) }}
+              </mat-chip>
+              
+              <!-- Resultados para categorías finalizadas -->
+              <div *ngIf="category.status === 'FINISHED'" class="category-results">
+                <div class="results-list">
+                  <mat-card *ngFor="let result of categoryResults[category.id]; let i = index" 
+                            class="result-card" 
+                            [class.winner]="i === 0">
+                    <mat-card-header>
+                      <div class="position-badge">
+                        <span class="position">{{ i + 1 }}°</span>
+                        <mat-icon *ngIf="i === 0" class="crown">emoji_events</mat-icon>
+                      </div>
+                      <div class="result-info">
+                        <mat-card-title>{{ result.participant.name }}</mat-card-title>
+                        <mat-card-subtitle>{{ result.participant.description }}</mat-card-subtitle>
+                      </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <div class="vote-count">
+                        <strong>{{ result._count?.votes || 0 }} votos</strong>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </div>
+              
+              <!-- Estado para categorías no finalizadas -->
+              <div *ngIf="category.status !== 'FINISHED'" class="pending-results">
+                <p>Esta categoría aún no ha finalizado. Estado actual: {{ getStatusText(category.status) }}</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Gestión de Participantes -->
+    <mat-tab label="Participantes">
+      <div class="tab-content">
+        <mat-card *ngIf="selectedCategory">
+          <mat-card-header>
+            <mat-card-title>Usuarios Participantes - {{ selectedCategory.name }}</mat-card-title>
+            <mat-card-subtitle>Los participantes son usuarios del sistema con rol PARTICIPANT</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Total de usuarios participantes: {{ users.length }}</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="selectedCategory">
+          <mat-card-header>
+            <mat-card-title>Participantes - {{ selectedCategory.name }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="participants" class="participants-table">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let participant">{{ participant.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let participant">{{ participant.description }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nominations">
+                <th mat-header-cell *matHeaderCellDef>Nominaciones</th>
+                <td mat-cell *matCellDef="let participant">{{ participant._count?.nominations || 0 }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let participant">
+                  <button mat-icon-button color="primary">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card *ngIf="!selectedCategory">
+          <mat-card-content>
+            <p>Selecciona una categoría para gestionar sus participantes.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

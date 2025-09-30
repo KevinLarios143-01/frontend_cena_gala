@@ -1,0 +1,210 @@
+<mat-toolbar class="oscar-navbar">
+  <mat-icon class="navbar-icon">emoji_events</mat-icon>
+  <span class="navbar-title">Cena de Gala</span>
+  <span class="spacer"></span>
+  <span class="user-info">
+    <mat-icon>person</mat-icon>
+    {{ authService.getCurrentUser()?.name }}
+  </span>
+  <button mat-button class="logout-btn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Cerrar Sesión
+  </button>
+</mat-toolbar>
+
+<div class="voting-container">
+  <div class="categories-section">
+    <div *ngFor="let category of categories" class="category-section">
+      <mat-card class="category-main-card">
+        <mat-card-header>
+          <mat-icon class="category-icon">how_to_vote</mat-icon>
+          <div class="category-header-content">
+            <mat-card-title>
+              {{ category.name }}
+              <mat-chip [color]="getStatusColor(category.status)" selected class="status-chip">
+                {{ getStatusText(category.status) }}
+              </mat-chip>
+            </mat-card-title>
+            <mat-card-subtitle>{{ category.description }}</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        
+        <mat-card-content>
+
+          <!-- Fase de Nominación -->
+          <div *ngIf="category.status === 'NOMINATION'" class="participants-grid">
+            
+            <!-- Mostrar usuarios nominados si ya nominó -->
+            <div *ngIf="hasUserNominated(category.id)" class="nominated-users">
+              <div class="nominations-compact">
+                <strong>Tus nominaciones ({{ getUserNominations(category.id).length }}/3):</strong>
+                <span *ngFor="let nomination of getUserNominations(category.id); let last = last">
+                  {{ nomination.participant.name }}<span *ngIf="!last">, </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Mostrar todas las opciones -->
+            <div>
+              <h3 *ngIf="canNominate(category.id)">Selecciona participantes para nominar ({{ getUserNominations(category.id).length }}/3):</h3>
+              <h3 *ngIf="!canNominate(category.id)">Participantes (límite alcanzado):</h3>
+              
+              <table mat-table [dataSource]="participants[category.id]" class="participants-table">
+                <ng-container matColumnDef="participant">
+                  <th mat-header-cell *matHeaderCellDef>Participante</th>
+                  <td mat-cell *matCellDef="let participant">
+                    <div class="participant-info">
+                      <img *ngIf="participant.imageUrl" 
+                           [src]="participant.imageUrl" 
+                           [alt]="participant.name"
+                           class="participant-photo">
+                      <div *ngIf="!participant.imageUrl" class="participant-photo-placeholder">
+                        {{ participant.name.charAt(0).toUpperCase() }}
+                      </div>
+                      <span class="participant-name">{{ participant.name }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="nominations">
+                  <th mat-header-cell *matHeaderCellDef>Nominaciones</th>
+                  <td mat-cell *matCellDef="let participant">{{ participant._count?.nominations || 0 }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Estado</th>
+                  <td mat-cell *matCellDef="let participant">
+                    <span *ngIf="isParticipantNominated(category.id, participant.id)" class="nomination-badge">
+                      <mat-icon>check</mat-icon>
+                      Nominado
+                    </span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                  <td mat-cell *matCellDef="let participant">
+                    <button *ngIf="canNominate(category.id) && !isParticipantNominated(category.id, participant.id)"
+                            mat-raised-button color="primary" 
+                            class="action-button"
+                            (click)="onNominate(category.id, participant.id)">
+                      {{ getActionText(category.status) }}
+                    </button>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['participant', 'nominations', 'status', 'actions']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['participant', 'nominations', 'status', 'actions'];"
+                    [class.nominated]="isParticipantNominated(category.id, row.id)"></tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Fase de Selección de Finalistas -->
+          <div *ngIf="category.status === 'SELECTION_FINALISTS'" class="waiting-section">
+            <mat-icon>hourglass_empty</mat-icon>
+            <h3>Seleccionando finalistas...</h3>
+            <p>El administrador está seleccionando los finalistas para esta categoría.</p>
+          </div>
+
+          <!-- Fase de Votación Final -->
+          <div *ngIf="category.status === 'VOTING_FINAL'" class="finalists-grid">
+            
+            <!-- Mostrar finalista votado si ya votó -->
+            <div *ngIf="hasUserVoted(category.id)" class="voted-finalist">
+              <div class="vote-compact">
+                <strong>Tu voto:</strong>
+                {{ getVotedFinalistName(category.id) }}
+              </div>
+            </div>
+
+            <!-- Mostrar todas las opciones -->
+            <div>
+              <h3 *ngIf="!hasUserVoted(category.id)">Vota por tu finalista favorito:</h3>
+              <h3 *ngIf="hasUserVoted(category.id)">Otros finalistas:</h3>
+              
+              <table mat-table [dataSource]="finalists[category.id]" class="participants-table">
+                <ng-container matColumnDef="participant">
+                  <th mat-header-cell *matHeaderCellDef>Finalista</th>
+                  <td mat-cell *matCellDef="let finalist">
+                    <div class="participant-info">
+                      <img *ngIf="finalist.participant.imageUrl" 
+                           [src]="finalist.participant.imageUrl" 
+                           [alt]="finalist.participant.name"
+                           class="participant-photo">
+                      <div *ngIf="!finalist.participant.imageUrl" class="participant-photo-placeholder">
+                        {{ finalist.participant.name.charAt(0).toUpperCase() }}
+                      </div>
+                      <span class="participant-name">{{ finalist.participant.name }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Estado</th>
+                  <td mat-cell *matCellDef="let finalist">
+                    <span *ngIf="getVotedFinalistName(category.id) === finalist.participant.name" class="nomination-badge">
+                      <mat-icon>how_to_vote</mat-icon>
+                      Votado
+                    </span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                  <td mat-cell *matCellDef="let finalist">
+                    <button *ngIf="!hasUserVoted(category.id)"
+                            mat-raised-button color="warn" 
+                            class="action-button"
+                            (click)="onVote(category.id, finalist.id)">
+                      {{ getActionText(category.status) }}
+                    </button>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['participant', 'status', 'actions']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['participant', 'status', 'actions'];"></tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Resultados Finales -->
+          <div *ngIf="category.status === 'FINISHED'" class="results-section">
+            <h3>Resultados Finales</h3>
+            <div class="results-list">
+              <mat-card *ngFor="let result of results[category.id]; let i = index" 
+                        class="result-card" 
+                        [class.winner]="i === 0">
+                <mat-card-header>
+                  <div class="position-badge">
+                    <span class="position">{{ i + 1 }}°</span>
+                    <mat-icon *ngIf="i === 0" class="crown">emoji_events</mat-icon>
+                  </div>
+                  <div class="result-info">
+                    <mat-card-title>{{ result.participant.name }}</mat-card-title>
+                    <mat-card-subtitle>{{ result.participant.description }}</mat-card-subtitle>
+                  </div>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="vote-count">
+                    <strong>{{ result._count?.votes || 0 }} votos</strong>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div *ngIf="categories.length === 0" class="no-categories">
+    <mat-card>
+      <mat-card-content>
+        <mat-icon>ballot</mat-icon>
+        <h2>No hay categorías disponibles</h2>
+        <p>Actualmente no hay categorías de votación disponibles.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
