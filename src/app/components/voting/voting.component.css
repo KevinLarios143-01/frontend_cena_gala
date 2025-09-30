@@ -637,3 +637,27 @@
   color: #ffd700 !important;
   font-weight: 500 !important;
 }
+
+/* Responsive voting component buttons */
+@media (max-width: 768px) {
+  .participants-table .action-button {
+    width: 100% !important;
+    font-size: 0.8rem !important;
+    padding: 6px 12px !important;
+  }
+  
+  .participants-table {
+    font-size: 0.85rem !important;
+  }
+  
+  .participant-photo {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  
+  .participant-photo-placeholder {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 12px !important;
+  }
+}

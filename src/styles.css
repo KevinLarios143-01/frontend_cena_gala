@@ -3,42 +3,56 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-/* Snackbar styles */
-.error-snackbar {
-  background-color: #f44336 !important;
-  color: white !important;
+/* Global responsive styles */
+@media (max-width: 768px) {
+  /* Make all Material buttons responsive */
+  button[mat-raised-button], button[mat-button] {
+    font-size: 0.85rem !important;
+    padding: 8px 16px !important;
+  }
+  
+  /* Make form fields responsive */
+  mat-form-field {
+    width: 100% !important;
+  }
+  
+  /* Make cards responsive */
+  mat-card {
+    margin: 8px !important;
+  }
+  
+  /* Make tables responsive */
+  .mat-mdc-table {
+    font-size: 0.85rem !important;
+  }
+  
+  /* Make toolbar responsive */
+  mat-toolbar {
+    padding: 0 8px !important;
+  }
+  
+  .navbar-title {
+    font-size: 1.2rem !important;
+  }
+  
+  .user-info {
+    font-size: 0.8rem !important;
+    padding: 4px 8px !important;
+  }
 }
 
-.success-snackbar {
-  background-color: #4caf50 !important;
-  color: white !important;
-}
-
-.warning-snackbar {
-  background-color: #ff9800 !important;
-  color: white !important;
-}
-
-/* Loading spinner */
-.loading-spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-}
-
-/* Error message */
-.error-message {
-  color: #f44336;
-  font-size: 14px;
-  margin: 8px 0;
-  text-align: center;
-}
-
-/* Success message */
-.success-message {
-  color: #4caf50;
-  font-size: 14px;
-  margin: 8px 0;
-  text-align: center;
+@media (max-width: 480px) {
+  /* Extra small screens */
+  button[mat-raised-button], button[mat-button] {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+  }
+  
+  .navbar-title {
+    font-size: 1rem !important;
+  }
+  
+  .user-info {
+    display: none !important;
+  }
 }
