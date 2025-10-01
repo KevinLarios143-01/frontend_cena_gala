@@ -73,7 +73,13 @@
                 <mat-icon>refresh</mat-icon>
                 Reiniciar Sistema
               </button>
-              <p class="reset-warning">Esto eliminará todos los datos y creará categorías por defecto</p>
+              <p class="reset-warning">Esto eliminará todos los datos y recreará participantes</p>
+              
+              <button mat-raised-button color="warn" class="delete-users-btn" (click)="onDeleteAllUsers()">
+                <mat-icon>delete_forever</mat-icon>
+                Eliminar Todos los Usuarios
+              </button>
+              <p class="reset-warning">⚠️ PELIGRO: Eliminará todos los usuarios participantes permanentemente</p>
             </div>
           </mat-card-content>
         </mat-card>

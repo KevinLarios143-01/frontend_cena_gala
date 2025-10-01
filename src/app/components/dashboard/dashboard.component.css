@@ -72,6 +72,20 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
+  
+  .dashboard-container {
+    padding: 10px !important;
+  }
+  
+  .participants-table {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .mat-mdc-table {
+    min-width: 600px !important;
+    font-size: 0.8rem !important;
+  }
 }
 
 .category-card {
@@ -371,6 +385,13 @@ button[mat-button]:hover {
   font-size: 14px;
   margin: 8px 0 0 0;
   font-style: italic;
+}
+
+.delete-users-btn {
+  background: #d32f2f !important;
+  color: white !important;
+  margin-top: 16px !important;
+  font-weight: 600 !important;
 }
 
 .ceremony-category-btn {

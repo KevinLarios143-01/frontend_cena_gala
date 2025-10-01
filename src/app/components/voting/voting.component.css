@@ -638,26 +638,75 @@
   font-weight: 500 !important;
 }
 
-/* Responsive voting component buttons */
+/* Mobile responsive table */
+.table-container {
+  overflow-x: auto !important;
+  width: 100% !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.participants-table {
+  width: 100% !important;
+}
+
+.mat-mdc-table {
+  min-width: 100% !important;
+}
+
 @media (max-width: 768px) {
-  .participants-table .action-button {
-    width: 100% !important;
-    font-size: 0.8rem !important;
-    padding: 6px 12px !important;
+  .voting-container {
+    padding: 10px !important;
   }
   
-  .participants-table {
-    font-size: 0.85rem !important;
+  .table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+  }
+  
+  .mat-mdc-table {
+    min-width: 500px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .mat-mdc-header-cell, .mat-mdc-cell {
+    padding: 6px 4px !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+  }
+  
+  .participant-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  
+  .participant-name {
+    font-size: 0.75rem !important;
   }
   
   .participant-photo {
-    width: 30px !important;
-    height: 30px !important;
+    width: 25px !important;
+    height: 25px !important;
+    flex-shrink: 0 !important;
   }
   
   .participant-photo-placeholder {
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 12px !important;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 10px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .action-button {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+    min-width: 60px !important;
+  }
+  
+  .nomination-badge {
+    font-size: 0.7rem !important;
+    padding: 2px 6px !important;
   }
 }

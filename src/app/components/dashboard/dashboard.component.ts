@@ -303,6 +303,36 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/winners-reveal'], { queryParams: { categoryId } });
   }
 
+  onDeleteAllUsers(): void {
+    const confirmText = 'ELIMINAR USUARIOS';
+    const userInput = prompt(`⚠️ ACCIÓN PELIGROSA ⚠️\n\nEsto eliminará TODOS los usuarios participantes del sistema de forma PERMANENTE.\n\nSolo se mantendrán los administradores.\n\nPara confirmar, escribe exactamente: ${confirmText}`);
+    
+    if (userInput === confirmText) {
+      this.apiService.deleteAllUsers().subscribe({
+        next: (response: any) => {
+          this.snackBar.open('Todos los usuarios participantes eliminados exitosamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+          this.loadCategories();
+          this.loadStats();
+        },
+        error: (error: any) => {
+          console.error('Error deleting users:', error);
+          this.snackBar.open('Error al eliminar usuarios', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
+    } else if (userInput !== null) {
+      this.snackBar.open('Operación cancelada - Texto incorrecto', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    }
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

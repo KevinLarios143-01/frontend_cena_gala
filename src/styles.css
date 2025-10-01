@@ -5,6 +5,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Global responsive styles */
 @media (max-width: 768px) {
+  /* Container responsive */
+  body {
+    overflow-x: auto !important;
+  }
+  
   /* Make all Material buttons responsive */
   button[mat-raised-button], button[mat-button] {
     font-size: 0.85rem !important;
@@ -21,9 +26,22 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     margin: 8px !important;
   }
   
-  /* Make tables responsive */
+  /* Make tables responsive with horizontal scroll */
   .mat-mdc-table {
-    font-size: 0.85rem !important;
+    font-size: 0.8rem !important;
+    min-width: 600px !important;
+  }
+  
+  .mat-mdc-header-cell, .mat-mdc-cell {
+    padding: 8px 4px !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Table container with scroll */
+  .participants-table, .mat-mdc-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
   }
   
   /* Make toolbar responsive */
