@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
       next: (stats) => {
         this.stats = stats;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading stats:', error);
         this.snackBar.open('Error al cargar estadísticas', 'Cerrar', {
           duration: 3000,
