@@ -54,7 +54,7 @@ export class WinnersRevealComponent implements OnInit {
         }
         this.loadCategoryResults();
       },
-      error: (error) => console.error('Error loading categories:', error)
+      error: (error) => console.error('Error loading categories')
     });
   }
 
@@ -64,7 +64,7 @@ export class WinnersRevealComponent implements OnInit {
         next: (results) => {
           category.winner = results[0];
         },
-        error: (error) => console.error('Error loading results:', error)
+        error: (error) => console.error('Error loading results')
       });
     });
   }

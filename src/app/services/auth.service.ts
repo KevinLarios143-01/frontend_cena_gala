@@ -29,21 +29,42 @@ export class AuthService {
   }
 
   private loadUserFromStorage(): void {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    
-    if (token && user) {
-      this.currentUserSubject.next(JSON.parse(user));
+    try {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      if (token && user) {
+        const parsedUser = JSON.parse(user);
+        if (this.isValidUser(parsedUser)) {
+          this.currentUserSubject.next(parsedUser);
+        } else {
+          this.logout();
+        }
+      }
+    } catch (error) {
+      this.logout();
     }
+  }
+
+  private isValidUser(user: any): boolean {
+    return user && 
+           typeof user.id === 'string' && 
+           typeof user.email === 'string' && 
+           typeof user.name === 'string' && 
+           ['SUPERADMIN', 'ADMIN', 'PARTICIPANT'].includes(user.role);
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password })
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
+          if (response?.token && response?.user && this.isValidUser(response.user)) {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            this.currentUserSubject.next(response.user);
+          } else {
+            throw new Error('Invalid response format');
+          }
         })
       );
   }
@@ -52,9 +73,13 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { email, password, name, tenantSlug })
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
+          if (response?.token && response?.user && this.isValidUser(response.user)) {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            this.currentUserSubject.next(response.user);
+          } else {
+            throw new Error('Invalid response format');
+          }
         })
       );
   }

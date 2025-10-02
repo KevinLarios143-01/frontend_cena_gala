@@ -46,18 +46,14 @@ export class VotingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('VotingComponent initialized');
     this.loadCategories();
   }
 
   loadCategories(): void {
-    console.log('Loading categories...');
     this.apiService.getCategories().subscribe({
       next: (categories) => {
-        console.log('Categories loaded:', categories);
         this.categories = categories;
         categories.forEach(category => {
-          console.log(`Category ${category.name} status: ${category.status}`);
           if (category.status === 'NOMINATION') {
             this.loadParticipants(category.id);
             this.checkUserNomination(category.id);
@@ -69,7 +65,7 @@ export class VotingComponent implements OnInit {
           }
         });
       },
-      error: (error) => console.error('Error loading categories:', error)
+      error: (error) => console.error('Error loading categories')
     });
   }
 
@@ -78,18 +74,16 @@ export class VotingComponent implements OnInit {
       next: (participants) => {
         this.participants[categoryId] = participants;
       },
-      error: (error) => console.error('Error loading participants:', error)
+      error: (error) => console.error('Error loading participants')
     });
   }
 
   loadFinalists(categoryId: string): void {
-    console.log('Loading finalists for category:', categoryId);
     this.apiService.getFinalists(categoryId).subscribe({
       next: (finalists) => {
-        console.log('Finalists loaded:', finalists);
         this.finalists[categoryId] = finalists;
       },
-      error: (error) => console.error('Error loading finalists:', error)
+      error: (error) => console.error('Error loading finalists')
     });
   }
 
@@ -98,26 +92,13 @@ export class VotingComponent implements OnInit {
       next: (results) => {
         this.results[categoryId] = results;
       },
-      error: (error) => console.error('Error loading results:', error)
+      error: (error) => console.error('Error loading results')
     });
   }
 
   onNominate(categoryId: string, participantId: string): void {
-    console.log('=== NOMINATE BUTTON CLICKED ===');
-    console.log('Category ID:', categoryId);
-    console.log('Participant ID:', participantId);
-    
-    this.snackBar.open('Botón nominar clickeado! Ver consola para detalles.', 'Cerrar', {
-      duration: 2000,
-      panelClass: ['success-snackbar']
-    });
-    
     this.apiService.createNomination(categoryId, participantId).subscribe({
       next: (result) => {
-        console.log('Nomination successful:', result);
-        // Nominations will be reloaded by checkUserNomination call below
-        
-        // Reload nominations after successful nomination
         this.checkUserNomination(categoryId);
         
         this.snackBar.open('Nominación registrada exitosamente', 'Cerrar', {
@@ -127,23 +108,14 @@ export class VotingComponent implements OnInit {
         this.loadCategories();
       },
       error: (error) => {
-        console.error('Nomination error:', error);
-        // El error se maneja globalmente por el interceptor
+        console.error('Nomination error');
       }
     });
   }
 
   onVote(categoryId: string, finalistId: string): void {
-    console.log('Vote clicked:', { categoryId, finalistId });
-    
-    this.snackBar.open('Botón votar clickeado! Ver consola para detalles.', 'Cerrar', {
-      duration: 2000,
-      panelClass: ['success-snackbar']
-    });
-    
     this.apiService.createVote(categoryId, finalistId).subscribe({
       next: (result) => {
-        console.log('Vote successful:', result);
         this.userVotes[categoryId] = true;
         
         // Store the voted finalist name
@@ -159,8 +131,7 @@ export class VotingComponent implements OnInit {
         this.loadCategories();
       },
       error: (error) => {
-        console.error('Vote error:', error);
-        // El error se maneja globalmente por el interceptor
+        console.error('Vote error');
       }
     });
   }
@@ -200,7 +171,6 @@ export class VotingComponent implements OnInit {
   checkUserVote(categoryId: string): void {
     this.apiService.checkUserVote(categoryId).subscribe({
       next: (result) => {
-        console.log('User vote check:', result);
         this.userVotes[categoryId] = result.hasVoted;
         
         if (result.hasVoted && result.vote) {
@@ -208,7 +178,7 @@ export class VotingComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error checking user vote:', error);
+        console.error('Error checking user vote');
         this.userVotes[categoryId] = false;
       }
     });
@@ -217,11 +187,10 @@ export class VotingComponent implements OnInit {
   checkUserNomination(categoryId: string): void {
     this.apiService.checkUserNomination(categoryId).subscribe({
       next: (result) => {
-        console.log('User nomination check:', result);
         this.userNominations[categoryId] = result.nominations || [];
       },
       error: (error) => {
-        console.error('Error checking user nomination:', error);
+        console.error('Error checking user nomination');
         this.userNominations[categoryId] = [];
       }
     });

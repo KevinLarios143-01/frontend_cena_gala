@@ -13,17 +13,27 @@ export class ErrorHandlerService {
   ) {}
 
   handleError(error: any, context?: string): void {
-    console.error(`Error in ${context || 'application'}:`, error);
+    // Sanitized logging without exposing sensitive data
+    console.error(`Error in ${context || 'application'}`);
 
     let message = 'Ha ocurrido un error inesperado';
 
-    if (error?.error?.error) {
-      message = error.error.error;
-    } else if (error?.message) {
-      message = error.message;
+    try {
+      if (error?.error?.error && typeof error.error.error === 'string') {
+        message = this.sanitizeMessage(error.error.error);
+      } else if (error?.message && typeof error.message === 'string') {
+        message = this.sanitizeMessage(error.message);
+      }
+    } catch (e) {
+      message = 'Ha ocurrido un error inesperado';
     }
 
     this.showError(message);
+  }
+
+  private sanitizeMessage(message: string): string {
+    // Remove potential XSS and limit length
+    return message.replace(/[<>"'&]/g, '').substring(0, 200);
   }
 
   showError(message: string): void {
@@ -48,9 +58,16 @@ export class ErrorHandlerService {
   }
 
   handleAuthError(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.showError('Sesión expirada. Por favor, inicia sesión nuevamente.');
-    this.router.navigate(['/login']);
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      this.showError('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      this.router.navigate(['/login']).catch(() => {
+        console.error('Navigation failed');
+      });
+    } catch (error) {
+      console.error('Auth error handling failed');
+      window.location.href = '/login';
+    }
   }
 }

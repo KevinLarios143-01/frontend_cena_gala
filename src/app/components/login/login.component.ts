@@ -64,14 +64,18 @@ export class LoginComponent {
       
       const { email, password } = this.loginForm.value;
       
-      this.authService.login(email.toLowerCase(), password.toLowerCase()).subscribe({
+      // Sanitizar inputs
+      const sanitizedEmail = this.sanitizeInput(email?.toLowerCase() || '');
+      const sanitizedPassword = this.sanitizeInput(password || '');
+      
+      this.authService.login(sanitizedEmail, sanitizedPassword).subscribe({
         next: () => {
           this.loading = false;
           this.redirectUser();
         },
-        error: () => {
+        error: (error) => {
           this.loading = false;
-          // El error se maneja globalmente por el interceptor
+          this.error = 'Error de autenticación. Verifica tus credenciales.';
         }
       });
     }
@@ -84,14 +88,20 @@ export class LoginComponent {
       
       const { name, email, password, tenantSlug } = this.registerForm.value;
       
-      this.authService.register(email.toLowerCase(), password.toLowerCase(), this.capitalizeWords(name), tenantSlug.toLowerCase()).subscribe({
+      // Sanitizar inputs
+      const sanitizedEmail = this.sanitizeInput(email?.toLowerCase() || '');
+      const sanitizedPassword = this.sanitizeInput(password || '');
+      const sanitizedName = this.sanitizeInput(name || '');
+      const sanitizedTenant = this.sanitizeInput(tenantSlug?.toLowerCase() || '');
+      
+      this.authService.register(sanitizedEmail, sanitizedPassword, this.capitalizeWords(sanitizedName), sanitizedTenant).subscribe({
         next: () => {
           this.loading = false;
           this.redirectUser();
         },
-        error: () => {
+        error: (error) => {
           this.loading = false;
-          // El error se maneja globalmente por el interceptor
+          this.error = 'Error al crear la cuenta. Intenta nuevamente.';
         }
       });
     }
@@ -99,6 +109,10 @@ export class LoginComponent {
 
   private capitalizeWords(text: string): string {
     return text.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase());
+  }
+
+  private sanitizeInput(input: string): string {
+    return input.replace(/[<>"'&]/g, '');
   }
 
   private redirectUser(): void {

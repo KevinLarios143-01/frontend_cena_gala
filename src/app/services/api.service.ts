@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
@@ -71,10 +71,18 @@ export class ApiService {
 
   private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('No authentication token');
+    }
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
+  }
+
+  private handleError(error: any): Observable<never> {
+    console.error('API service error');
+    return throwError(() => error);
   }
 
   // Categories
@@ -106,8 +114,14 @@ export class ApiService {
 
   // Nominations
   createNomination(categoryId: string, participantId: string): Observable<Nomination> {
+    if (!categoryId || !participantId) {
+      return throwError(() => new Error('Category ID and Participant ID are required'));
+    }
     return this.http.post<{success: boolean, data: Nomination}>(`${this.apiUrl}/nominations`, { categoryId, participantId }, { headers: this.getHeaders() })
-      .pipe(map(response => response.data));
+      .pipe(
+        map(response => response.data),
+        catchError(this.handleError)
+      );
   }
 
   checkUserNomination(categoryId: string): Observable<{nominationCount: number, nominations: any[], canNominate: boolean}> {
@@ -135,7 +149,11 @@ export class ApiService {
 
   // Votes
   createVote(categoryId: string, finalistId: string): Observable<Vote> {
-    return this.http.post<Vote>(`${this.apiUrl}/votes`, { categoryId, finalistId }, { headers: this.getHeaders() });
+    if (!categoryId || !finalistId) {
+      return throwError(() => new Error('Category ID and Finalist ID are required'));
+    }
+    return this.http.post<Vote>(`${this.apiUrl}/votes`, { categoryId, finalistId }, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
   }
 
   getVoteResults(categoryId: string): Observable<Finalist[]> {

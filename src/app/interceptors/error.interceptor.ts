@@ -4,6 +4,15 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
 
+const logCriticalError = (error: HttpErrorResponse): void => {
+  // In production, send to logging service
+  console.error('Critical server error:', {
+    status: error.status,
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent
+  });
+};
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const snackBar = inject(MatSnackBar);
@@ -25,7 +34,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             errorMessage = error.error?.error || 'No autorizado';
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            router.navigate(['/login']);
+            router.navigate(['/login']).catch(navError => {
+              console.error('Navigation Error:', navError);
+            });
             break;
           case 403:
             errorMessage = error.error?.error || 'Acceso denegado';
@@ -47,12 +58,18 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         panelClass: ['error-snackbar']
       });
 
+      // Log error details for debugging (sanitized)
       console.error('HTTP Error:', {
         status: error.status,
-        message: errorMessage,
-        url: error.url,
-        error: error.error
+        statusText: error.statusText,
+        url: error.url?.split('?')[0], // Remove query params
+        timestamp: new Date().toISOString()
       });
+
+      // Log to external service in production
+      if (error.status >= 500) {
+        logCriticalError(error);
+      }
 
       return throwError(() => error);
     })

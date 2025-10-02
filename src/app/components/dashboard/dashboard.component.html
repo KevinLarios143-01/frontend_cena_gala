@@ -74,7 +74,7 @@
                 Reiniciar Sistema
               </button>
               <p class="reset-warning">Esto eliminará todos los datos y recreará participantes</p>
-              
+
               <button mat-raised-button color="warn" class="delete-users-btn" (click)="onDeleteAllUsers()">
                 <mat-icon>delete_forever</mat-icon>
                 Eliminar Todos los Usuarios
@@ -95,12 +95,12 @@
                 <mat-label>Nombre</mat-label>
                 <input matInput formControlName="name" required>
               </mat-form-field>
-              
+
               <mat-form-field appearance="outline">
                 <mat-label>Descripción</mat-label>
                 <textarea matInput formControlName="description" rows="3"></textarea>
               </mat-form-field>
-              
+
               <button mat-raised-button color="primary" type="submit" [disabled]="!categoryForm.valid">
                 Crear Categoría
               </button>
@@ -138,34 +138,35 @@
                     <mat-icon>delete</mat-icon>
                     Eliminar
                   </button>
-                  
+
                   <!-- Botones de progreso normal -->
-                  <button mat-button *ngIf="category.status === 'NOMINATION'" 
-                          (click)="onGenerateFinalists(category.id)">
+                  <button mat-button *ngIf="category.status === 'NOMINATION'"
+                    (click)="onGenerateFinalists(category.id)">
                     Generar Finalistas
                   </button>
-                  <button mat-button *ngIf="category.status === 'SELECTION_FINALISTS'" 
-                          (click)="onUpdateCategoryStatus(category.id, 'VOTING_FINAL')">
+                  <button mat-button *ngIf="category.status === 'SELECTION_FINALISTS'"
+                    (click)="onUpdateCategoryStatus(category.id, 'VOTING_FINAL')">
                     Iniciar Votación
                   </button>
-                  <button mat-button *ngIf="category.status === 'VOTING_FINAL'" 
-                          (click)="onUpdateCategoryStatus(category.id, 'FINISHED')">
+                  <button mat-button *ngIf="category.status === 'VOTING_FINAL'"
+                    (click)="onUpdateCategoryStatus(category.id, 'FINISHED')">
                     Finalizar
                   </button>
                   <br>
                   <!-- Botones de reapertura -->
-                  <button mat-button color="accent" *ngIf="category.status === 'SELECTION_FINALISTS' || category.status === 'VOTING_FINAL' || category.status === 'FINISHED'" 
-                          (click)="onReopenNominations(category.id)">
+                  <button mat-button color="accent"
+                    *ngIf="category.status === 'SELECTION_FINALISTS' || category.status === 'VOTING_FINAL' || category.status === 'FINISHED'"
+                    (click)="onReopenNominations(category.id)">
                     <mat-icon>refresh</mat-icon>
                     Reabrir Nominaciones
                   </button>
-                  <button mat-button color="accent" *ngIf="category.status === 'FINISHED'" 
-                          (click)="onReopenVoting(category.id)">
+                  <button mat-button color="accent" *ngIf="category.status === 'FINISHED'"
+                    (click)="onReopenVoting(category.id)">
                     <mat-icon>refresh</mat-icon>
                     Reabrir Votación
                   </button>
-                  <button mat-button class="ceremony-category-btn" *ngIf="category.status === 'FINISHED'" 
-                          (click)="startCategoryReveal(category.id)">
+                  <button mat-button class="ceremony-category-btn" *ngIf="category.status === 'FINISHED'"
+                    (click)="startCategoryReveal(category.id)">
                     <mat-icon>celebration</mat-icon>
                     Ceremonia
                   </button>
@@ -191,13 +192,12 @@
               <mat-chip [color]="getStatusColor(category.status)" selected>
                 {{ getStatusText(category.status) }}
               </mat-chip>
-              
+
               <!-- Resultados para categorías finalizadas -->
               <div *ngIf="category.status === 'FINISHED'" class="category-results">
                 <div class="results-list">
-                  <mat-card *ngFor="let result of categoryResults[category.id]; let i = index" 
-                            class="result-card" 
-                            [class.winner]="i === 0">
+                  <mat-card *ngFor="let result of categoryResults[category.id]; let i = index" class="result-card"
+                    [class.winner]="i === 0">
                     <mat-card-header>
                       <div class="position-badge">
                         <span class="position">{{ i + 1 }}°</span>
@@ -216,7 +216,7 @@
                   </mat-card>
                 </div>
               </div>
-              
+
               <!-- Estado para categorías no finalizadas -->
               <div *ngIf="category.status !== 'FINISHED'" class="pending-results">
                 <p>Esta categoría aún no ha finalizado. Estado actual: {{ getStatusText(category.status) }}</p>

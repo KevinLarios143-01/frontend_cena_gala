@@ -41,7 +41,7 @@ import { ApiService, Category, Participant } from '../../services/api.service';
 })
 export class DashboardComponent implements OnInit {
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
-  
+
   categories: Category[] = [];
   participants: Participant[] = [];
   users: any[] = [];
@@ -49,11 +49,11 @@ export class DashboardComponent implements OnInit {
   stats: any = {};
   categoryResults: { [categoryId: string]: any[] } = {};
   activeTab: string = 'categories';
-  
+
   categoryForm: FormGroup;
-  
+
   displayedColumns = ['name', 'description', 'nominations', 'actions'];
-  
+
   constructor(
     private fb: FormBuilder,
     public authService: AuthService,
@@ -80,7 +80,13 @@ export class DashboardComponent implements OnInit {
         this.categories = categories;
         this.loadAllResults();
       },
-      error: (error) => console.error('Error loading categories:', error)
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.snackBar.open('Error al cargar categorías', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -89,18 +95,28 @@ export class DashboardComponent implements OnInit {
       next: (stats) => {
         this.stats = stats;
       },
-      error: (error) => console.error('Error loading stats:', error)
+      error: (error) => {
+        console.error('Error loading stats:', error);
+        this.snackBar.open('Error al cargar estadísticas', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
   loadParticipants(categoryId: string): void {
-    console.log('Loading participants for category:', categoryId);
     this.apiService.getParticipantsByCategory(categoryId).subscribe({
       next: (participants) => {
-        console.log('Participants loaded:', participants);
         this.participants = participants;
       },
-      error: (error) => console.error('Error loading participants:', error)
+      error: (error) => {
+        console.error('Error loading participants:', error);
+        this.snackBar.open('Error al cargar participantes', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -110,8 +126,18 @@ export class DashboardComponent implements OnInit {
         next: () => {
           this.categoryForm.reset();
           this.loadCategories();
+          this.snackBar.open('Categoría creada exitosamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
         },
-        error: (error) => console.error('Error creating category:', error)
+        error: (error) => {
+          console.error('Error creating category:', error);
+          this.snackBar.open('Error al crear categoría', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
       });
     }
   }
@@ -121,7 +147,13 @@ export class DashboardComponent implements OnInit {
       next: (users) => {
         this.users = users;
       },
-      error: (error) => console.error('Error loading users:', error)
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.snackBar.open('Error al cargar usuarios', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -138,35 +170,47 @@ export class DashboardComponent implements OnInit {
       next: (results) => {
         this.categoryResults[categoryId] = results;
       },
-      error: (error) => console.error('Error loading category results:', error)
+      error: (error) => {
+        console.error('Error loading category results:', error);
+        this.snackBar.open('Error al cargar resultados', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
   onSelectCategory(category: Category): void {
-    console.log('=== GESTIONAR BUTTON CLICKED ===');
-    console.log('Selected category:', category);
-    
     this.selectedCategory = category;
     this.loadParticipants(category.id);
-    
+
     // Cambiar a la pestaña de participantes (índice 2 porque Resultados es índice 1)
     this.tabGroup.selectedIndex = 2;
-    
+
     // Mostrar mensaje de confirmación
     this.snackBar.open(`Gestionando categoría: ${category.name}`, 'Cerrar', {
       duration: 3000,
       panelClass: ['success-snackbar']
     });
-    
-    console.log('Category selected, switched to participants tab');
   }
 
   onUpdateCategoryStatus(categoryId: string, status: string): void {
     this.apiService.updateCategoryStatus(categoryId, status).subscribe({
       next: () => {
         this.loadCategories();
+        this.snackBar.open('Estado actualizado exitosamente', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
       },
-      error: (error) => console.error('Error updating category status:', error)
+      error: (error) => {
+        console.error('Error updating category status:', error);
+        const errorMessage = error.error?.error || 'Error al actualizar estado';
+        this.snackBar.open(errorMessage, 'Cerrar', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -203,6 +247,10 @@ export class DashboardComponent implements OnInit {
         },
         error: (error: any) => {
           console.error('Error deleting category:', error);
+          this.snackBar.open('Error al eliminar categoría', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
         }
       });
     }
@@ -221,7 +269,7 @@ export class DashboardComponent implements OnInit {
           this.loadUsers();
         },
         error: (error) => {
-          console.error('Error resetting system:', error);
+          console.error('Error resetting system');
           this.snackBar.open('Error al reiniciar el sistema', 'Cerrar', {
             duration: 3000,
             panelClass: ['error-snackbar']
@@ -252,7 +300,7 @@ export class DashboardComponent implements OnInit {
   }
 
   onReopenNominations(categoryId: string): void {
-    if (confirm('¿Estás seguro de que quieres reabrir las nominaciones? Todos los datos existentes se mantendrán y más usuarios podrán nominar.')) {
+    if (confirm('¿Estás seguro de que quieres reabrir las nominaciones? Esto eliminará los finalistas y votos existentes.')) {
       this.apiService.reopenNominations(categoryId).subscribe({
         next: () => {
           this.loadCategories();
@@ -263,8 +311,9 @@ export class DashboardComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error reopening nominations:', error);
-          this.snackBar.open('Error al reabrir nominaciones', 'Cerrar', {
-            duration: 3000,
+          const errorMessage = error.error?.error || 'Error al reabrir nominaciones';
+          this.snackBar.open(errorMessage, 'Cerrar', {
+            duration: 5000,
             panelClass: ['error-snackbar']
           });
         }
@@ -273,7 +322,7 @@ export class DashboardComponent implements OnInit {
   }
 
   onReopenVoting(categoryId: string): void {
-    if (confirm('¿Estás seguro de que quieres reabrir la votación? Los votos existentes se mantendrán y más usuarios podrán votar.')) {
+    if (confirm('¿Estás seguro de que quieres reabrir la votación? Esto eliminará los votos existentes.')) {
       this.apiService.reopenVoting(categoryId).subscribe({
         next: () => {
           this.loadCategories();
@@ -284,8 +333,9 @@ export class DashboardComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error reopening voting:', error);
-          this.snackBar.open('Error al reabrir votación', 'Cerrar', {
-            duration: 3000,
+          const errorMessage = error.error?.error || 'Error al reabrir votación';
+          this.snackBar.open(errorMessage, 'Cerrar', {
+            duration: 5000,
             panelClass: ['error-snackbar']
           });
         }
@@ -304,7 +354,7 @@ export class DashboardComponent implements OnInit {
   onDeleteAllUsers(): void {
     const confirmText = 'ELIMINAR USUARIOS';
     const userInput = prompt(`⚠️ ACCIÓN PELIGROSA ⚠️\n\nEsto eliminará TODOS los usuarios participantes del sistema de forma PERMANENTE.\n\nSolo se mantendrán los administradores.\n\nPara confirmar, escribe exactamente: ${confirmText}`);
-    
+
     if (userInput === confirmText) {
       this.apiService.deleteAllUsers().subscribe({
         next: (response: any) => {
@@ -317,8 +367,9 @@ export class DashboardComponent implements OnInit {
         },
         error: (error: any) => {
           console.error('Error deleting users:', error);
-          this.snackBar.open('Error al eliminar usuarios', 'Cerrar', {
-            duration: 3000,
+          const errorMessage = error.error?.error || 'Error al eliminar usuarios';
+          this.snackBar.open(errorMessage, 'Cerrar', {
+            duration: 5000,
             panelClass: ['error-snackbar']
           });
         }
