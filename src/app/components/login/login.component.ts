@@ -40,13 +40,13 @@ export class LoginComponent {
     private router: Router
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
 
     this.registerForm = this.fb.group({
       name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       tenantSlug: ['', [Validators.required]]
     });
@@ -64,7 +64,7 @@ export class LoginComponent {
       
       const { email, password } = this.loginForm.value;
       
-      this.authService.login(email, password).subscribe({
+      this.authService.login(email.toLowerCase(), password.toLowerCase()).subscribe({
         next: () => {
           this.loading = false;
           this.redirectUser();
@@ -84,7 +84,7 @@ export class LoginComponent {
       
       const { name, email, password, tenantSlug } = this.registerForm.value;
       
-      this.authService.register(email, password, name, tenantSlug).subscribe({
+      this.authService.register(email.toLowerCase(), password.toLowerCase(), this.capitalizeWords(name), tenantSlug.toLowerCase()).subscribe({
         next: () => {
           this.loading = false;
           this.redirectUser();
@@ -95,6 +95,10 @@ export class LoginComponent {
         }
       });
     }
+  }
+
+  private capitalizeWords(text: string): string {
+    return text.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase());
   }
 
   private redirectUser(): void {

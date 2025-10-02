@@ -161,4 +161,13 @@ export class ApiService {
   reopenVoting(categoryId: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/categories/${categoryId}/reopen-voting`, {}, { headers: this.getHeaders() });
   }
+
+  deleteAllUsers(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/delete-all-users`, {}, { headers: this.getHeaders() });
+  }
+
+  getUsers(): Observable<any[]> {
+    return this.http.get<{success: boolean, data: any[]}>(`${this.apiUrl}/admin/users`, { headers: this.getHeaders() })
+      .pipe(map(response => response.data));
+  }
 }

@@ -117,15 +117,12 @@ export class DashboardComponent implements OnInit {
   }
 
   loadUsers(): void {
-    // Simular carga de usuarios - en implementación real vendría del backend
-    this.users = [
-      { id: '1', name: 'Juan Pérez', email: 'juan@example.com' },
-      { id: '2', name: 'María García', email: 'maria@example.com' },
-      { id: '3', name: 'Carlos López', email: 'carlos@example.com' },
-      { id: '4', name: 'Ana Sánchez', email: 'ana@example.com' },
-      { id: '5', name: 'Luis Martínez', email: 'luis@example.com' },
-      { id: '6', name: 'Pedro González', email: 'pedro@example.com' }
-    ];
+    this.apiService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+      },
+      error: (error) => console.error('Error loading users:', error)
+    });
   }
 
   loadAllResults(): void {
@@ -221,6 +218,7 @@ export class DashboardComponent implements OnInit {
           });
           this.loadCategories();
           this.loadStats();
+          this.loadUsers();
         },
         error: (error) => {
           console.error('Error resetting system:', error);
@@ -301,6 +299,36 @@ export class DashboardComponent implements OnInit {
 
   startCategoryReveal(categoryId: string): void {
     this.router.navigate(['/winners-reveal'], { queryParams: { categoryId } });
+  }
+
+  onDeleteAllUsers(): void {
+    const confirmText = 'ELIMINAR USUARIOS';
+    const userInput = prompt(`⚠️ ACCIÓN PELIGROSA ⚠️\n\nEsto eliminará TODOS los usuarios participantes del sistema de forma PERMANENTE.\n\nSolo se mantendrán los administradores.\n\nPara confirmar, escribe exactamente: ${confirmText}`);
+    
+    if (userInput === confirmText) {
+      this.apiService.deleteAllUsers().subscribe({
+        next: (response: any) => {
+          this.snackBar.open('Todos los usuarios participantes eliminados exitosamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+          this.loadCategories();
+          this.loadStats();
+        },
+        error: (error: any) => {
+          console.error('Error deleting users:', error);
+          this.snackBar.open('Error al eliminar usuarios', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
+    } else if (userInput !== null) {
+      this.snackBar.open('Operación cancelada - Texto incorrecto', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    }
   }
 
   logout(): void {

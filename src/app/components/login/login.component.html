@@ -22,13 +22,10 @@
               
               <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
                 <mat-form-field appearance="fill" class="custom-field">
-                  <mat-label>Correo Electrónico</mat-label>
-                  <input matInput type="email" formControlName="email" required>
+                  <mat-label>Usuario o Email</mat-label>
+                  <input matInput type="text" formControlName="email" required>
                   <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-                    El email es requerido
-                  </mat-error>
-                  <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-                    Email inválido
+                    El usuario o email es requerido
                   </mat-error>
                 </mat-form-field>
 
@@ -78,13 +75,10 @@
                 </mat-form-field>
 
                 <mat-form-field appearance="fill" class="custom-field">
-                  <mat-label>Correo Electrónico</mat-label>
-                  <input matInput type="email" formControlName="email" required>
+                  <mat-label>Usuario o Email</mat-label>
+                  <input matInput type="text" formControlName="email" required>
                   <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
-                    El email es requerido
-                  </mat-error>
-                  <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
-                    Email inválido
+                    El usuario o email es requerido
                   </mat-error>
                 </mat-form-field>
 

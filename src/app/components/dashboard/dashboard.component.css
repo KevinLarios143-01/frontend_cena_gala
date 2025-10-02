@@ -67,6 +67,27 @@
   margin-top: 16px;
 }
 
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .dashboard-container {
+    padding: 10px !important;
+  }
+  
+  .participants-table {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .mat-mdc-table {
+    min-width: 600px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
 .category-card {
   margin-bottom: 20px;
   border-radius: 16px !important;
@@ -366,10 +387,36 @@ button[mat-button]:hover {
   font-style: italic;
 }
 
+.delete-users-btn {
+  background: #d32f2f !important;
+  color: white !important;
+  margin-top: 16px !important;
+  font-weight: 600 !important;
+}
+
 .ceremony-category-btn {
   background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%) !important;
   color: #2d2d2d !important;
   font-weight: 600 !important;
   border-radius: 8px !important;
   font-size: 0.85rem !important;
+}
+
+/* Responsive buttons */
+@media (max-width: 768px) {
+  .category-card button {
+    width: 100% !important;
+    margin: 4px 0 !important;
+    font-size: 0.8rem !important;
+    padding: 8px 12px !important;
+  }
+  
+  .ceremony-category-btn {
+    font-size: 0.75rem !important;
+  }
+  
+  .action-button {
+    width: 100% !important;
+    margin: 4px 0 !important;
+  }
 }
