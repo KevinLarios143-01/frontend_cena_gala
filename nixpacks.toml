@@ -1,11 +1,3 @@
-[phases.setup]
-nixPkgs = ['nodejs-18_x', 'npm-9_x']
-
-[phases.install]
-cmds = ['npm install']
-
-[phases.build]
-cmds = ['npm run build:prod']
-
-[start]
-cmd = 'node server.js'
+cmds = ["npm ci", "npm run build"]
+[phases.start]
+cmd = "npx serve dist/frontend -s -l $PORT"

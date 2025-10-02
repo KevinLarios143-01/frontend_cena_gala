@@ -64,18 +64,17 @@ export class LoginComponent {
       
       const { email, password } = this.loginForm.value;
       
-      // Sanitizar inputs
-      const sanitizedEmail = this.sanitizeInput(email?.toLowerCase() || '');
-      const sanitizedPassword = this.sanitizeInput(password || '');
+      const credentials = this.sanitizeCredentials(email, password);
       
-      this.authService.login(sanitizedEmail, sanitizedPassword).subscribe({
+      this.authService.login(credentials.email, credentials.password).subscribe({
         next: () => {
           this.loading = false;
           this.redirectUser();
         },
         error: (error) => {
           this.loading = false;
-          this.error = 'Error de autenticación. Verifica tus credenciales.';
+          this.logSecureError('Login failed', error);
+          this.error = this.getSecureErrorMessage(error, 'Error de autenticación. Verifica tus credenciales.');
         }
       });
     }
@@ -88,20 +87,17 @@ export class LoginComponent {
       
       const { name, email, password, tenantSlug } = this.registerForm.value;
       
-      // Sanitizar inputs
-      const sanitizedEmail = this.sanitizeInput(email?.toLowerCase() || '');
-      const sanitizedPassword = this.sanitizeInput(password || '');
-      const sanitizedName = this.sanitizeInput(name || '');
-      const sanitizedTenant = this.sanitizeInput(tenantSlug?.toLowerCase() || '');
+      const userData = this.sanitizeUserData(name, email, password, tenantSlug);
       
-      this.authService.register(sanitizedEmail, sanitizedPassword, this.capitalizeWords(sanitizedName), sanitizedTenant).subscribe({
+      this.authService.register(userData.email, userData.password, userData.name, userData.tenantSlug).subscribe({
         next: () => {
           this.loading = false;
           this.redirectUser();
         },
         error: (error) => {
           this.loading = false;
-          this.error = 'Error al crear la cuenta. Intenta nuevamente.';
+          this.logSecureError('Registration failed', error);
+          this.error = this.getSecureErrorMessage(error, 'Error al crear la cuenta. Intenta nuevamente.');
         }
       });
     }
@@ -112,7 +108,39 @@ export class LoginComponent {
   }
 
   private sanitizeInput(input: string): string {
-    return input.replace(/[<>"'&]/g, '');
+    return input.trim().replace(/[<>"'&]/g, '');
+  }
+
+  private sanitizeCredentials(email: string, password: string) {
+    return {
+      email: this.sanitizeInput(email?.toLowerCase() || ''),
+      password: this.sanitizeInput(password || '')
+    };
+  }
+
+  private sanitizeUserData(name: string, email: string, password: string, tenantSlug: string) {
+    return {
+      name: this.capitalizeWords(this.sanitizeInput(name || '')),
+      email: this.sanitizeInput(email?.toLowerCase() || ''),
+      password: this.sanitizeInput(password || ''),
+      tenantSlug: this.sanitizeInput(tenantSlug?.toLowerCase() || '')
+    };
+  }
+
+  private logSecureError(operation: string, error: any): void {
+    const sanitizedError = {
+      status: typeof error?.status === 'number' ? error.status : 0,
+      timestamp: new Date().toISOString(),
+      operation: this.sanitizeInput(operation)
+    };
+    console.error('Operation failed:', JSON.stringify(sanitizedError));
+  }
+
+  private getSecureErrorMessage(error: any, defaultMessage: string): string {
+    if (error?.error?.message && typeof error.error.message === 'string') {
+      return this.sanitizeInput(error.error.message);
+    }
+    return defaultMessage;
   }
 
   private redirectUser(): void {
