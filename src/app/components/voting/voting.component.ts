@@ -65,7 +65,13 @@ export class VotingComponent implements OnInit {
           }
         });
       },
-      error: (error) => console.error('Error loading categories')
+      error: (error) => {
+        console.error('Error loading categories');
+        this.snackBar.open('Error al cargar categorías', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -74,7 +80,13 @@ export class VotingComponent implements OnInit {
       next: (participants) => {
         this.participants[categoryId] = participants;
       },
-      error: (error) => console.error('Error loading participants')
+      error: (error) => {
+        console.error('Error loading participants');
+        this.snackBar.open('Error al cargar participantes', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -83,7 +95,13 @@ export class VotingComponent implements OnInit {
       next: (finalists) => {
         this.finalists[categoryId] = finalists;
       },
-      error: (error) => console.error('Error loading finalists')
+      error: (error) => {
+        console.error('Error loading finalists');
+        this.snackBar.open('Error al cargar finalistas', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -92,7 +110,13 @@ export class VotingComponent implements OnInit {
       next: (results) => {
         this.results[categoryId] = results;
       },
-      error: (error) => console.error('Error loading results')
+      error: (error) => {
+        console.error('Error loading results');
+        this.snackBar.open('Error al cargar resultados', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
     });
   }
 
@@ -109,6 +133,10 @@ export class VotingComponent implements OnInit {
       },
       error: (error) => {
         console.error('Nomination error');
+        this.snackBar.open('Error al registrar nominación', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }
@@ -132,6 +160,10 @@ export class VotingComponent implements OnInit {
       },
       error: (error) => {
         console.error('Vote error');
+        this.snackBar.open('Error al registrar voto', 'Cerrar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }
@@ -228,6 +260,8 @@ export class VotingComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']).catch(() => {
+      window.location.href = '/login';
+    });
   }
 }

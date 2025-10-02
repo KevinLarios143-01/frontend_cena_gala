@@ -54,7 +54,10 @@ export class WinnersRevealComponent implements OnInit {
         }
         this.loadCategoryResults();
       },
-      error: (error) => console.error('Error loading categories')
+      error: (error) => {
+        console.error('Error loading categories');
+        this.router.navigate(['/dashboard']);
+      }
     });
   }
 
@@ -62,9 +65,12 @@ export class WinnersRevealComponent implements OnInit {
     this.categories.forEach(category => {
       this.apiService.getVoteResults(category.id).subscribe({
         next: (results) => {
-          category.winner = results[0];
+          category.winner = results && results.length > 0 ? results[0] : null;
         },
-        error: (error) => console.error('Error loading results')
+        error: (error) => {
+          console.error('Error loading results');
+          category.winner = null;
+        }
       });
     });
   }
@@ -105,6 +111,8 @@ export class WinnersRevealComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/dashboard']).catch(() => {
+      window.location.href = '/dashboard';
+    });
   }
 }
