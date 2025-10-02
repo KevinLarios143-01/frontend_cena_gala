@@ -61,11 +61,11 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.loading = true;
       this.error = '';
-      
+
       const { email, password } = this.loginForm.value;
-      
+
       const credentials = this.sanitizeCredentials(email, password);
-      
+
       this.authService.login(credentials.email, credentials.password).subscribe({
         next: () => {
           this.loading = false;
@@ -84,11 +84,11 @@ export class LoginComponent {
     if (this.registerForm.valid) {
       this.loading = true;
       this.error = '';
-      
+
       const { name, email, password, tenantSlug } = this.registerForm.value;
-      
+
       const userData = this.sanitizeUserData(name, email, password, tenantSlug);
-      
+
       this.authService.register(userData.email, userData.password, userData.name, userData.tenantSlug).subscribe({
         next: () => {
           this.loading = false;
@@ -119,11 +119,16 @@ export class LoginComponent {
   }
 
   private sanitizeUserData(name: string, email: string, password: string, tenantSlug: string) {
+    const sanitizedName = this.capitalizeWords(this.sanitizeInput(name || ''));
+    const sanitizedEmail = this.sanitizeInput(email?.toLowerCase() || '');
+    const sanitizedPassword = this.sanitizeInput(password || '');
+    const sanitizedTenant = this.sanitizeInput(tenantSlug?.toLowerCase() || '');
+
     return {
-      name: this.capitalizeWords(this.sanitizeInput(name || '')),
-      email: this.sanitizeInput(email?.toLowerCase() || ''),
-      password: this.sanitizeInput(password || ''),
-      tenantSlug: this.sanitizeInput(tenantSlug?.toLowerCase() || '')
+      name: sanitizedName,
+      email: sanitizedEmail,
+      password: sanitizedPassword,
+      tenantSlug: sanitizedTenant
     };
   }
 
