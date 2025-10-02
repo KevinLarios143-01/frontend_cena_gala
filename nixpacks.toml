@@ -1,3 +1,4 @@
-cmds = ["npm ci", "npm run build"]
-[phases.start]
-cmd = "npx serve dist/frontend -s -l $PORT"
+cmds = ['npm run build:prod']
+
+[start]
+cmd = 'node server.js'
