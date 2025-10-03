@@ -33,7 +33,7 @@
 
   <!-- Category Reveal -->
   <div class="category-reveal" *ngIf="currentCategoryIndex < categories.length && (isRevealing || showWinner)">
-    <div class="category-info">
+    <div class="category-info" *ngIf="!singleCategoryMode">
       <h2 class="category-name">{{ getCurrentCategory()?.name }}</h2>
       <p class="category-description">{{ getCurrentCategory()?.description }}</p>
     </div>
@@ -56,6 +56,24 @@
     <div class="winner-reveal" *ngIf="showWinner" [@slideIn]>
       <div class="winner-card">
         <div class="winner-crown">👑</div>
+        <div class="winner-photo-container">
+          <img *ngIf="getCurrentCategory()?.winner?.participant?.user?.imageUrl" 
+               [src]="getImageUrl(getCurrentCategory()?.winner?.participant?.user?.imageUrl!)" 
+               [alt]="getCurrentCategory()?.winner?.participant?.name"
+               class="ceremony-winner-photo"
+               (error)="onImageError($event)"
+               (load)="onImageLoad($event)"
+               #winnerImage>
+          <div *ngIf="!getCurrentCategory()?.winner?.participant?.user?.imageUrl" class="ceremony-winner-placeholder">
+            {{ getCurrentCategory()?.winner?.participant?.name?.charAt(0)?.toUpperCase() }}
+          </div>
+          <!-- Placeholder que se muestra cuando la imagen falla -->
+          <div class="ceremony-winner-placeholder" 
+               style="display: none;"
+               #imagePlaceholder>
+            {{ getCurrentCategory()?.winner?.participant?.name?.charAt(0)?.toUpperCase() }}
+          </div>
+        </div>
         <div class="winner-info">
           <h1 class="winner-name">{{ getCurrentCategory()?.winner?.participant?.name }}</h1>
           <p class="winner-description">{{ getCurrentCategory()?.winner?.participant?.description }}</p>

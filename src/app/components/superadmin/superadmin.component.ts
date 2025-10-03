@@ -39,6 +39,7 @@ export class SuperAdminComponent implements OnInit {
   tenants: any[] = [];
   stats: any = {};
   tenantForm: FormGroup;
+  superAdminForm: FormGroup;
   displayedColumns: string[] = ['name', 'slug', 'users', 'categories', 'nominations', 'votes', 'status', 'actions'];
 
   constructor(
@@ -55,6 +56,12 @@ export class SuperAdminComponent implements OnInit {
       adminName: ['', Validators.required],
       adminEmail: ['', [Validators.required, Validators.email]],
       adminPassword: ['', [Validators.required, Validators.minLength(6)]]
+    });
+
+    this.superAdminForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 

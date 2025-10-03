@@ -65,10 +65,21 @@ export class WinnersRevealComponent implements OnInit {
     this.categories.forEach(category => {
       this.apiService.getVoteResults(category.id).subscribe({
         next: (results) => {
-          category.winner = results && results.length > 0 ? results[0] : null;
+          if (results && results.length > 0) {
+            const winner = results[0];
+            // Asegurar que tenemos la estructura correcta
+            category.winner = {
+              participant: winner.participant,
+              _count: winner._count
+            };
+            console.log('Winner data:', category.winner);
+            console.log('Image URL:', winner.participant?.imageUrl);
+          } else {
+            category.winner = null;
+          }
         },
         error: (error) => {
-          console.error('Error loading results');
+          console.error('Error loading results:', error);
           category.winner = null;
         }
       });
@@ -108,6 +119,40 @@ export class WinnersRevealComponent implements OnInit {
 
   getCurrentCategory(): any {
     return this.categories[this.currentCategoryIndex];
+  }
+
+  getImageUrl(imageUrl: string): string {
+    console.log('Getting image URL for:', imageUrl);
+    
+    if (!imageUrl) {
+      console.log('No image URL provided');
+      return '';
+    }
+    
+    // Si ya es una URL completa (http/https), devolverla tal como está
+    if (imageUrl.startsWith('http')) {
+      console.log('Using full URL:', imageUrl);
+      return imageUrl;
+    }
+    
+    // Si es solo un nombre de archivo, construir la URL de Firebase usando la ruta de usuarios
+    const firebaseUrl = `https://firebasestorage.googleapis.com/v0/b/fl-farms-gl.firebasestorage.app/o/images%2Fusers%2F${encodeURIComponent(imageUrl)}?alt=media`;
+    console.log('Constructed Firebase URL:', firebaseUrl);
+    return firebaseUrl;
+  }
+
+  onImageError(event: any): void {
+    console.error('Image failed to load:', event.target.src);
+    // Ocultar la imagen y mostrar el placeholder
+    event.target.style.display = 'none';
+    const placeholder = event.target.parentElement.querySelector('.ceremony-winner-placeholder');
+    if (placeholder) {
+      placeholder.style.display = 'inline-flex';
+    }
+  }
+
+  onImageLoad(event: any): void {
+    console.log('Image loaded successfully:', event.target.src);
   }
 
   goBack(): void {

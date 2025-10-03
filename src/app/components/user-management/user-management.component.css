@@ -1,0 +1,31 @@
+.card-icon {
+  color: #d4af37;
+  margin-right: 12px;
+  font-size: 24px;
+}
+
+.users-table {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.user-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #d4af37;
+}
+
+.user-photo-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #64748b;
+  border: 2px solid #d4af37;
+}

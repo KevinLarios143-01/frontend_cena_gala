@@ -37,13 +37,13 @@ export class VotingComponent implements OnInit {
   userVotes: { [categoryId: string]: boolean } = {};
   userNominations: { [categoryId: string]: any[] } = {}; // Store array of nominations
   votedFinalists: { [categoryId: string]: string } = {}; // Store voted finalist name
-  
+
   constructor(
     public authService: AuthService,
     private apiService: ApiService,
     private router: Router,
     private snackBar: MatSnackBar
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -124,7 +124,7 @@ export class VotingComponent implements OnInit {
     this.apiService.createNomination(categoryId, participantId).subscribe({
       next: (result) => {
         this.checkUserNomination(categoryId);
-        
+
         this.snackBar.open('Nominación registrada exitosamente', 'Cerrar', {
           duration: 3000,
           panelClass: ['success-snackbar']
@@ -145,13 +145,13 @@ export class VotingComponent implements OnInit {
     this.apiService.createVote(categoryId, finalistId).subscribe({
       next: (result) => {
         this.userVotes[categoryId] = true;
-        
+
         // Store the voted finalist name
         const votedFinalist = this.finalists[categoryId]?.find(f => f.id === finalistId);
         if (votedFinalist) {
           this.votedFinalists[categoryId] = votedFinalist.participant.name;
         }
-        
+
         this.snackBar.open('Voto registrado exitosamente', 'Cerrar', {
           duration: 3000,
           panelClass: ['success-snackbar']
@@ -204,7 +204,7 @@ export class VotingComponent implements OnInit {
     this.apiService.checkUserVote(categoryId).subscribe({
       next: (result) => {
         this.userVotes[categoryId] = result.hasVoted;
-        
+
         if (result.hasVoted && result.vote) {
           this.votedFinalists[categoryId] = result.vote.finalist.participant.name;
         }
@@ -256,6 +256,22 @@ export class VotingComponent implements OnInit {
     // Return a mock object for the table
     const name = this.votedFinalists[categoryId];
     return name ? { finalist: { participant: { name: name } } } : null;
+  }
+
+  getImageUrl(imageUrl: string): string {
+    if (!imageUrl) return '';
+
+    // Si ya es una URL completa (http/https), devolverla tal como está
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+
+    // Si es solo un nombre de archivo, construir la URL de Firebase usando la ruta de usuarios
+    return `https://firebasestorage.googleapis.com/v0/b/fl-farms-gl.firebasestorage.app/o/images%2Fusers%2F${encodeURIComponent(imageUrl)}?alt=media`;
+  }
+
+  onImageError(event: any, participantName: string): void {
+    console.error('Image failed to load for:', participantName, 'URL:', event.target.src);
   }
 
   logout(): void {

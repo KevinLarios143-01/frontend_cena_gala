@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
+import { storage } from '../config/firebase.config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export interface Category {
   id: string;
@@ -21,12 +23,19 @@ export interface Category {
   };
 }
 
+export interface User {
+  id: string;
+  name: string;
+  imageUrl?: string;
+}
+
 export interface Participant {
   id: string;
   name: string;
   description?: string;
   imageUrl?: string;
   categoryId: string;
+  user?: User;
   _count?: {
     nominations: number;
   };
@@ -188,4 +197,25 @@ export class ApiService {
     return this.http.get<{success: boolean, data: any[]}>(`${this.apiUrl}/admin/users`, { headers: this.getHeaders() })
       .pipe(map(response => response.data));
   }
+
+  updateUserPhoto(userId: string, imageUrl: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/admin/users/${userId}/photo`, { imageUrl }, { headers: this.getHeaders() });
+  }
+
+  getUser(userId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admin/users/${userId}`, { headers: this.getHeaders() });
+  }
+  
+  updateUser(userId: string, userData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/admin/users/${userId}`, userData, { headers: this.getHeaders() });
+  }
+
+  uploadUserPhoto(userId: string, file: File): Observable<string> {
+    const fileName = `users/${userId}/${Date.now()}-${file.name}`;
+    const storageRef = ref(storage, fileName);
+    
+    return from(uploadBytes(storageRef, file).then(() => getDownloadURL(storageRef)));
+  }
+
+
 }

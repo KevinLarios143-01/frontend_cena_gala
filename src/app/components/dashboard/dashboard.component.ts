@@ -16,6 +16,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../services/auth.service';
 import { ApiService, Category, Participant } from '../../services/api.service';
+import { UserManagementComponent } from '../user-management/user-management.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,7 +35,8 @@ import { ApiService, Category, Participant } from '../../services/api.service';
     MatTableModule,
     MatChipsModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    UserManagementComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
