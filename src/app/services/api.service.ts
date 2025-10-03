@@ -198,6 +198,11 @@ export class ApiService {
       .pipe(map(response => response.data));
   }
 
+  getParticipantUsers(): Observable<any[]> {
+    return this.http.get<{success: boolean, data: any[]}>(`${this.apiUrl}/participants/users`, { headers: this.getHeaders() })
+      .pipe(map(response => response.data));
+  }
+
   updateUserPhoto(userId: string, imageUrl: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/admin/users/${userId}/photo`, { imageUrl }, { headers: this.getHeaders() });
   }

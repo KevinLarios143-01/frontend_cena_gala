@@ -657,6 +657,12 @@
   border-radius: 20px;
 }
 
+.participants-btn {
+  color: #ffd700 !important;
+  font-weight: 500 !important;
+  margin-right: 8px !important;
+}
+
 .logout-btn {
   color: #ffd700 !important;
   font-weight: 500 !important;

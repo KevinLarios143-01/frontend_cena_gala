@@ -1,0 +1,61 @@
+<mat-toolbar class="oscar-navbar">
+  <mat-icon class="navbar-icon">people</mat-icon>
+  <span class="navbar-title">Participantes - Cena de Gala</span>
+  <span class="spacer"></span>
+  <span class="user-info">
+    <mat-icon>person</mat-icon>
+    {{ authService.getCurrentUser()?.name }}
+  </span>
+  <button mat-button class="logout-btn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Cerrar Sesión
+  </button>
+</mat-toolbar>
+
+<div class="participants-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <button mat-button class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </button>
+    <h1>Participantes del Sistema</h1>
+    <p>Conoce a todos los participantes de la Cena de Gala</p>
+  </div>
+
+  <!-- Participants Grid -->
+  <div class="participants-section">
+    <div class="participants-grid" *ngIf="!loading">
+      <mat-card *ngFor="let participant of participants" class="participant-card">
+        <div class="participant-image">
+          <img [src]="participant.imageUrl || 'assets/default-avatar.png'" 
+               [alt]="participant.name"
+               (error)="onImageError($event)">
+        </div>
+        <mat-card-content>
+          <h3>{{ participant.name }}</h3>
+          <p class="participant-email">{{ participant.email }}</p>
+          <div class="participant-stats">
+            <span class="stat-item">
+              <mat-icon>how_to_vote</mat-icon>
+              Participante
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-section">
+      <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+      <p>Cargando participantes...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && participants.length === 0" class="empty-section">
+      <mat-icon class="empty-icon">people_outline</mat-icon>
+      <h3>No hay participantes</h3>
+      <p>Aún no se han registrado participantes en el sistema</p>
+    </div>
+  </div>
+</div>

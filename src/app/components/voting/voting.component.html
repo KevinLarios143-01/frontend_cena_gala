@@ -2,6 +2,10 @@
   <mat-icon class="navbar-icon">emoji_events</mat-icon>
   <span class="navbar-title">Cena de Gala</span>
   <span class="spacer"></span>
+  <button mat-button class="participants-btn" (click)="viewParticipants()">
+    <mat-icon>people</mat-icon>
+    Participantes
+  </button>
   <span class="user-info">
     <mat-icon>person</mat-icon>
     {{ authService.getCurrentUser()?.name }}

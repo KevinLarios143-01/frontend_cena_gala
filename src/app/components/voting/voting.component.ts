@@ -274,6 +274,10 @@ export class VotingComponent implements OnInit {
     console.error('Image failed to load for:', participantName, 'URL:', event.target.src);
   }
 
+  viewParticipants(): void {
+    this.router.navigate(['/participants']);
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']).catch(() => {
