@@ -1,0 +1,8 @@
+node_modules
+.angular
+src
+*.md
+.editorconfig
+.gitignore
+tsconfig*.json
+angular.json
